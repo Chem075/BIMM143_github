@@ -1,2 +1,2 @@
 # BIMM143_github
-My BIMM143 classwork for FA23.
+My UCSD BIMM143 classwork for FA23.
