@@ -3,7 +3,7 @@ Yufei (A16222438)
 
 # Outline
 
-TOday we will apply the machine learning method we introduced last class
+Today we will apply the machine learning method we introduced last class
 on breast cancer biopsy from fine needle aspiration.
 
 # Preparing the data
