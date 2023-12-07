@@ -1,6 +1,7 @@
 # BIMM143_github
 My UC San Diego [BIMM143](https://bioboot.github.io/bimm143_F23/) classwork for FA23.
 
+## Index of Material
 - Class05: [Intro to ggplot](https://github.com/Chem075/BIMM143_github/blob/main/class05/class5.md)
 - Class06: [R functions](https://github.com/Chem075/BIMM143_github/blob/main/class06/class06.md)
 - Class07: [Machine Learning](https://github.com/Chem075/BIMM143_github/blob/main/class07/class07.md)
