@@ -1,0 +1,31 @@
+---
+title: "Q6"
+author: "Yufei (A16222438)"
+date: "2023-10-28"
+output: pdf
+---
+
+Write your own function starting from the code above that analyzes protein drug interactions by reading in any protein PDB data and outputs a plot for the specified protein.
+
+```{r}
+# library bio3d package to use its functions
+library(bio3d)
+
+# Function to analyze a protein with given PDB id, by plotting the Bfactor against residue number, as well as highlighting the secondary structure of chainA.
+# input = protein PDB id
+# output = plot of B factor against residue number.
+# usage: analyzeP("PDB id of the target protein")
+analyzeP <- function(id){
+  s <- read.pdb(id)
+  s.chainA <- trim.pdb(s, chain="A", elety="CA")
+  s.b <- s.chainA$atom$b
+  plotb3(s.b, sse=s.chainA, typ="l", ylab="Bfactor")
+}
+
+# example
+analyzeP("4AKE") # kinase with drug
+analyzeP("1AKE") # kinase no drug
+analyzeP("1E4Y") # kinase with drug
+
+```
+

@@ -1,0 +1,189 @@
+---
+title: "Class 07: Machine Learning 1"
+author: "Yufei (A16222438)"
+format: pdf
+---
+
+# Clustering
+
+We will start today's lab with clustering methods, in particular so-called **K-means**. The main function for this in R is `kmeans()`.
+
+Let's try it on some made-up data where we know the answer.
+
+```{r}
+# rnorm function draws random points from a normal distribution
+# rnorm(number of points, mean, sd). default: z.
+x <- rnorm(1000, mean = 3)
+hist(x)
+```
+
+make 60 points
+```{r}
+# points from two distributions
+tmp <- c(rnorm(30, mean = 3), rnorm(30, mean = -3))
+# create a y axis as the reversed list of tmp, build matrix by cbind
+tdtmp <- cbind(x=tmp, y=rev(tmp))
+#check the data
+head (tdtmp)
+#plot the data
+plot (tdtmp)
+```
+
+K-means clustering of two sets of points of size 30, 30.
+```{r}
+# identify the two clusters by kmeans(). Iteration = 20 times.
+k <- kmeans (tdtmp, centers = 2, nstart = 20)
+k
+```
+
+**Q1.** How many points are in each cluster?
+```{r}
+k$size
+```
+
+**Q2** Cluster membership?
+```{r}
+k$cluster
+```
+
+
+**Q3.** Cluster centers?
+```{r}
+k$centers
+```
+
+**Q4.** Plot my clustering results?
+```{r}
+plot(tdtmp, col = k$cluster+2, pch = 16)
+```
+
+**Q5.** Cluster the data again with kmeans() into 4 groups and plot the results.
+```{r}
+kf <- kmeans(tdtmp, centers = 4, nstart = 20)
+plot(tdtmp, col = kf$cluster, pch = 16)
+```
+
+K-means is very popular mostly because it is fast and relatively straightforward to run and understand. But it has a big limitation in that you need to tell it how many groups (k, or centers) you want. If we don't know k beforehand, we need trial and error to obtain the optimal result with minimal SS and cluster number.
+
+
+# Hierachical clustering
+
+The main function in base R is called `hclust()`. You have to pass it in a "distance matrix" not just your input data. 
+
+We can generate a distance matrix with the `dist()` function.
+
+```{r}
+hc <- hclust (dist(tdtmp))
+hc
+```
+
+```{r}
+plot(hc)
+```
+Interpretation: 
+- It grouped the numbers into two groups: <=30(left) and >30(right). 
+- Height of bars = distance of points.
+- Determine number of clusters by observing the number of highest bars.
+
+To find clusters (cluster membership vector) from a 'hclust()' result, we can "cut" the tree at a certain height that we like
+```{r}
+# cut the tree on plot
+plot(hc)
+abline(h=8, col = "red")
+#get membership vector
+grps <- cutree(hc, h=8)
+table(grps)
+```
+
+Plot the result
+```{r}
+plot(tdtmp, col=grps+2, pch = 16)
+```
+
+# PCA: Principal Component Analysis
+
+Read the data consumption in grams (per person, per week) of 17 different types of food-stuff measured and averaged in the four countries of the United Kingdom in 1997.
+```{r}
+x <- read.csv("https://tinyurl.com/UK-foods")
+```
+
+**Q1.** How many rows and columns are in your new data frame named x? What R functions could you use to answer this questions?
+```{r}
+nrow(x)
+ncol(x)
+
+#or
+dim(x)
+
+# Checking data
+head(x)
+```
+
+
+It looks like the row-names here were not set properly as we were expecting 4 columns (one for each of the 4 countries of the UK - not 5 as reported from the dim() function)
+```{r}
+rownames(x) <- x[,1]
+food <- x[,-1]
+head(x)
+```
+It is dangerous way of processing data as it deletes the first column every time we run this code, until all columns removed.
+
+Instead, we can read the data properly
+```{r}
+x <- read.csv("https://tinyurl.com/UK-foods", row.names = 1)
+head(x)
+```
+
+**Q2.** Which approach to solving the ‘row-names problem’ mentioned above do you prefer and why? Is one approach more robust than another under certain circumstances?
+
+We can do bar plots
+```{r}
+barplot(as.matrix(x), beside=T, col=rainbow(nrow(x)))
+```
+
+**Q3:** Changing what optional argument in the above barplot() function results in the following plot?
+```{r}
+barplot(as.matrix(x), beside=F, col=rainbow(nrow(x)))
+```
+
+**Q5:** Generating all pairwise plots may help somewhat. Can you make sense of the following code and resulting figure? What does it mean if a given point lies on the diagonal for a given plot?
+
+A pairs plot can be useful, if we don't have much dimensions
+```{r}
+pairs(x, col = rainbow(nrow(x)), pch = 16)
+```
+Interpretation: X and Y axis represent data from corresponding country, color of dot represent food category. Deviation from diagonal represent difference in data. Drawback: time-consuming and confusing to interpret.
+
+**Q6.** What is the main differences between N. Ireland and the other countries of the UK in terms of this data-set?
+
+## PCA of UK Food Data (17 dimensions)
+
+PCA can help us make sense of these types of datasets. Let's see how it works.
+
+The main function in "base" R is called `prcomp()`. It needs matrix column to be the dimensions of analysis (in this case food type), and row to be group (in this case countries).
+
+```{r}
+#transpose x by `t()` function
+head(t(x))
+```
+
+```{r}
+pca <- prcomp(t(x))
+summary(pca)
+```
+Interpretation: PC1 captures 67.44% of variance, and PC2 captures 96.5% variance in data.
+
+```{r}
+pca$x
+```
+
+```{r}
+plot(pca$x[,1],pca$x[,2], col = c("orange", "red", "blue", "darkgreen"), pch = 16)
+```
+
+The "loadings" tell us how much the original variables (in our case, food) contribute to the new variable (PC).
+```{r}
+pca$rotation
+#plot PC1, with graph margin of 2
+barplot(pca$rotation[,1], las = 2)
+```
