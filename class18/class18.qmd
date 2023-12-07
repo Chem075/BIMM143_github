@@ -1,0 +1,202 @@
+---
+title: "class18"
+author: "Yufei (A16222438)"
+format: html
+---
+
+# 1. Class 17 output
+
+Read blast result downloaded from the remote computer
+```{r}
+b <- read.table("mm-second.x.zebrafish.tsv", sep = "\t")
+colnames(b) <- c("qseqid", "sseqid", "pident", "length", "mismatch", "gapopen", "qstart", "qend", "sstart", "send", "evalue", "bitscore")
+head (b)
+```
+
+Make a histogram of the $bitscore values. 
+```{r}
+library(ggplot2)
+ggplot(b,aes(bitscore)) + geom_histogram(binwidth = 39)
+```
+The distribution of bitscore is bimodal, with a peak around 0 and another around 300.
+
+Relationship between **percent identity** * **sequence length** and **bitscore** for the alignments we generated?
+```{r}
+ggplot(b, aes((pident * (qend - qstart)), bitscore)) + geom_point(alpha=0.1) + geom_smooth(method = "gam", formula = y ~ s(x, bs = "cs"))
+```
+
+#2 Class18: Transcript Analysis
+
+We've imported the transcripts from remote computers to local project folder. With each sample having its own directory containing the Kallisto output, we can import the transcript count estimates into R using:
+```{r}
+library(tximport)
+library (rhdf5)
+# setup the folder and filenames to read
+folders <- dir(pattern="SRR21568*")
+samples <- sub("_quant", "", folders)
+files <- file.path( folders, "abundance.h5" )
+names(files) <- samples
+
+txi.kallisto <- tximport(files, type = "kallisto", txOut = TRUE)
+```
+
+```{r}
+# inspect the imported results
+head(txi.kallisto$counts)
+# see how many transcripts we have for each sample
+colSums(txi.kallisto$counts)
+# how many transcripts are detected in at least one sample
+sum(rowSums(txi.kallisto$counts)>0)
+```
+
+Before subsequent analysis, we might want to filter out those annotated transcripts with no reads:
+```{r}
+to.keep <- rowSums(txi.kallisto$counts) > 0
+kset.nonzero <- txi.kallisto$counts[to.keep,]
+```
+
+And also filter out those with no change over samples:
+```{r}
+keep2 <- apply(kset.nonzero,1,sd)>0
+x <- kset.nonzero[keep2,]
+```
+
+## PCA
+
+Now we can perform PCA analysis.
+```{r}
+pca <- prcomp(t(x), scale=TRUE)
+summary(pca)
+```
+
+Now we can use the PCs as a co-ordinate system for visualizing the summarized transcriptomic profiles of each sample:
+```{r}
+library(ggrepel)
+
+# Make metadata object for the samples
+colData <- data.frame(condition = factor(rep(c("control", "treatment"), each = 2)))
+rownames(colData) <- colnames(txi.kallisto$counts)
+
+# Make the data.frame for ggplot 
+y <- as.data.frame(pca$x)
+y$Condition <- as.factor(colData$condition)
+
+ggplot(y) +
+  aes(PC1, PC2, col=Condition) +
+  geom_point() +
+  geom_text_repel(label=rownames(y)) +
+  theme_bw()
+```
+
+Make PC1 vs 3, 2 vs 3
+```{r}
+ggplot(y) +
+  aes(PC1, PC3, col=Condition) +
+  geom_point() +
+  geom_text_repel(label=rownames(y)) +
+  theme_bw()
+
+ggplot(y) +
+  aes(PC2, PC3, col=Condition) +
+  geom_point() +
+  geom_text_repel(label=rownames(y)) +
+  theme_bw()
+```
+PC1 separates control from treatment, PC2 separates the two controls, and PC3 separates the two treatments.
+
+## Differential-expression
+
+We can also use DESeq2 to complete the differential-expression analysis. First we need to create a DESeqDataSet for use:
+```{r}
+library(DESeq2)
+sampleTable <- data.frame(condition = factor(rep(c("control", "treatment"), each = 2)))
+rownames(sampleTable) <- colnames(txi.kallisto$counts)
+dds <- DESeqDataSetFromTximport(txi.kallisto,
+                                sampleTable, 
+                                ~condition)
+```
+
+```{r}
+dds <- DESeq(dds)
+res <- results(dds)
+head(res)
+```
+
+Visualizing the result with volcano plot.
+```{r}
+res.df <- as.data.frame(res)
+head(res.df)
+```
+
+```{r}
+#remove NA values
+library(dplyr)
+res.df <- res.df %>% filter (is.na(log2FoldChange) != TRUE , is.na (padj) != TRUE)
+head(res.df)
+```
+```{r}
+#make a volcano plot with ggplot
+res.df$diffexpressed <- "NO"
+res.df$diffexpressed[res.df$log2FoldChange > 2 & res.df$padj < 0.05] <- "UP"
+res.df$diffexpressed[res.df$log2FoldChange < -2 & res.df$padj < 0.05] <- "DOWN"
+
+ggplot(res.df) + 
+  aes(log2FoldChange, -log10(padj), col = diffexpressed) + 
+  geom_point() +
+  theme_minimal() +
+     # Add dashed line
+     geom_vline(xintercept = c(-2, 2), col = "gray", linetype = 'dashed') +
+     geom_hline(yintercept = -log10(0.05), col = "gray", linetype = 'dashed') + 
+     # to set the colours of our variable
+     scale_color_manual(values = c("#00AFBB", "grey", "#bb0c00"),
+                        labels = c("Downregulated", "Not significant", "Upregulated"))
+```
+
+We can also run pathway analysis
+```{r}
+#add entrez id
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+res.df$entrez <- mapIds(org.Hs.eg.db,
+  #Our symbol
+  keys = row.names(res.df),
+  keytype = "ENSEMBLTRANS",
+  # target symbol
+  column = "ENTREZID",
+  # if multiple values appear
+  multivals = "first")
+```
+```{r}
+library(pathview)
+library(gage)
+library(gageData)
+data(kegg.sets.hs)
+data(sigmet.idx.hs)
+
+foldchanges = res.df$log2FoldChange
+names(foldchanges) = res.df$entrez
+head(foldchanges)
+
+keggres = gage(foldchanges, gsets=kegg.sets.hs)
+attributes(keggres)
+```
+```{r}
+# Look at the first few down (less) pathways
+head(keggres$less)
+```
+```{r}
+#look at top down pathway
+pathview(gene.data=foldchanges, pathway.id="hsa05145")
+```
+```{r}
+#Look at first few up pathways
+head(keggres$greater)
+```
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa00240")
+```
+
+![Top downregulated pathway](hsa05145.pathview.png)
+
+![Top upregulated pathway](hsa00240.pathview.png)
+
