@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.433">
+<meta name="generator" content="quarto-1.3.450">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -247,12 +247,12 @@ Attaching package: 'lubridate'</code></pre>
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co">#how many days I have lived on earth</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">today</span>()<span class="sc">-</span><span class="fu">ymd</span>(<span class="st">"2001-12-09"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Time difference of 8031 days</code></pre>
+<pre><code>Time difference of 8033 days</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#how many seconds I have been alive</span></span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">time_length</span>(<span class="fu">today</span>()<span class="sc">-</span><span class="fu">ymd</span>(<span class="st">"2001-12-09"</span>), <span class="st">"seconds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 693878400</code></pre>
+<pre><code>[1] 694051200</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -351,12 +351,12 @@ Attaching package: 'dplyr'</code></pre>
 5 Not Hispanic or Latino White    1986-01-01    2016-09-12 2020_dataset
 6 Not Hispanic or Latino White    1986-01-01    2016-09-12 2020_dataset
        age age_of_boost
-1 37.92471     30.69678
-2 37.92471     30.69678
-3 37.92471     30.69678
-4 37.92471     30.69678
-5 37.92471     30.69678
-6 37.92471     30.69678</code></pre>
+1 37.93018     30.69678
+2 37.93018     30.69678
+3 37.93018     30.69678
+4 37.93018     30.69678
+5 37.93018     30.69678
+6 37.93018     30.69678</code></pre>
 </div>
 </div>
 <p><strong>Q10.</strong> Now using the same procedure join meta with titer data so we can further analyze this data in terms of time of visit aP/wP, male/female etc.</p>
@@ -397,12 +397,12 @@ Attaching package: 'dplyr'</code></pre>
 5 Not Hispanic or Latino White    1986-01-01    2016-09-12 2020_dataset
 6 Not Hispanic or Latino White    1986-01-01    2016-09-12 2020_dataset
        age age_of_boost
-1 37.92471     30.69678
-2 37.92471     30.69678
-3 37.92471     30.69678
-4 37.92471     30.69678
-5 37.92471     30.69678
-6 37.92471     30.69678</code></pre>
+1 37.93018     30.69678
+2 37.93018     30.69678
+3 37.93018     30.69678
+4 37.93018     30.69678
+5 37.93018     30.69678
+6 37.93018     30.69678</code></pre>
 </div>
 </div>
 <p><strong>Q11.</strong> How many specimens (i.e.&nbsp;entries in abdata) do we have for each isotype?</p>
@@ -458,12 +458,12 @@ Attaching package: 'dplyr'</code></pre>
 5                Unknown White    1983-01-01    2016-10-10 2020_dataset
 6                Unknown White    1983-01-01    2016-10-10 2020_dataset
        age age_of_boost
-1 37.92471     30.69678
-2 37.92471     30.69678
-3 37.92471     30.69678
-4 40.92539     33.77413
-5 40.92539     33.77413
-6 40.92539     33.77413</code></pre>
+1 37.93018     30.69678
+2 37.93018     30.69678
+3 37.93018     30.69678
+4 40.93087     33.77413
+5 40.93087     33.77413
+6 40.93087     33.77413</code></pre>
 </div>
 </div>
 <p>ab response in relation to vaccine type</p>
@@ -580,7 +580,7 @@ Attaching package: 'dplyr'</code></pre>
 <span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
 <span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
 <span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">3</span>,<span class="dv">14</span>), <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">col =</span> <span class="st">"darkgrey"</span>) <span class="sc">+</span></span>
-<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"2021 dataset IgG PT"</span>,</span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"2020 dataset IgG PT"</span>,</span>
 <span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Dashed lines indicate day 0 (pre-boost) and 14 (apparent peak levels)"</span>) <span class="sc">+</span></span>
 <span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">xlim</span>(<span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">125</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">

@@ -305,7 +305,7 @@ ggplot(IgG.pt.2020) +
   geom_point() +
   geom_line() +
   geom_vline(xintercept = c(0,3,14), linetype = "dashed", col = "darkgrey") +
-  labs(title="2021 dataset IgG PT",
+  labs(title="2020 dataset IgG PT",
        subtitle = "Dashed lines indicate day 0 (pre-boost) and 14 (apparent peak levels)") +
   xlim(c(0,125))
 ```
