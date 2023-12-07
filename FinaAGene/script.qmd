@@ -1,0 +1,33 @@
+---
+title: "Fina a Gene Project"
+author: "Yufe (A16222438)"
+format: html
+---
+
+```{r}
+# Load bio3d package
+library(bio3d)
+
+# Read alignment
+align <- read.fasta("find-a-gene_muscle.fst") 
+
+# Calculate sequence identity matrix
+iden <- seqidentity(align)
+iden
+```
+
+```{r}
+# Plot heatmap 
+heatmap(iden, margins = c(15,15), col = heat.colors(256))
+```
+
+```{r}
+conc <- consensus (align)
+conc$seq
+```
+
+```{r}
+NT <- read.fasta("NeTRIM46.txt")
+blast.pdb(NT)
+```
+

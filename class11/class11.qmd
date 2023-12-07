@@ -1,0 +1,41 @@
+---
+title: "class11"
+Author: "Yufei Liu (A16222438)"
+format: html
+---
+
+# Section 1. Proportion of G/G in a population
+
+
+Downloaded CSV file from Ensemble:
+https://www.ensembl.org/Homo_sapiens/Variation/Sample?db=core;r=17:39894595-39895595;v=rs8067378;vdb=variation;vf=105535077#373531_tablePanel
+
+```{r}
+mxl <- read.csv("373531-SampleGenotypes-Homo_sapiens_Variation_Sample_rs8067378.csv")
+head(mxl)
+```
+```{r}
+table(mxl$Genotype..forward.strand.)/nrow(mxl)
+```
+
+# Setion4 Population Analysis
+
+One sample is obviously not enough to know what is happening in a population. You are interested in assessing genetic differences on a population scale. So, you processed about ~230 samples and did the normalization on a genome level. Now, you want to find whether there is any association of the 4 asthma-associated SNPs (rs8067378…) on ORMDL3 expression.
+
+How many samples do we have?
+```{r}
+expr <- read.table("rs8067378_ENSG00000172057.6.txt")
+head(expr)
+
+nrow(expr)
+table(expr$geno)
+```
+
+make a summary boxplot for display
+```{r}
+library(ggplot2)
+
+ggplot(expr, aes(geno, exp, fill = geno)) + geom_boxplot(notch = T)
+```
+
+It is clear that G allele reduces the expression level!
